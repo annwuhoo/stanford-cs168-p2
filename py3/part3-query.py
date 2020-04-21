@@ -37,7 +37,7 @@ def import_data():
     #sparse_counts = coo_matrix((counts, (article_ids, word_ids)))
 
 
-    print "max_wordid =", max_wordid
+    print("max_wordid =", max_wordid)
     return data
 
 #def expand_vector(V):
@@ -92,13 +92,13 @@ def get_best_candidate(candidates, Q, dataset):
 
 
         # Get sparse cosine calculation between Q and C
-        print "max =", max_wordid
-        word_ids, cnts = zip(*Q)
+        print("max =", max_wordid)
+        word_ids, cnts = list(zip(*Q))
         coo1 = coo_matrix((cnts, ([0]*len(word_ids), word_ids)), shape=(1, max_wordid+1))
-        word_ids, cnts = zip(*C)
+        word_ids, cnts = list(zip(*C))
         coo2 = coo_matrix((cnts, (word_ids, [0]*len(word_ids))), shape=(max_wordid+1, 1))
-        print coo1.shape
-        print coo2.shape
+        print(coo1.shape)
+        print(coo2.shape)
         cosine_sim = coo1.dot(coo2)/(linalg.norm(coo1)*linalg.norm(coo2)) # use Cosine similarity
         #cosine_sim = (np.dot(carr, qarr) / (np.linalg.norm(carr) * np.linalg.norm(qarr)))
 
@@ -127,11 +127,11 @@ def query(dataset, buckets_dict, d, l, Q):
 def query_assess(dataset, buckets_dict, d, l):
     q_idx, err_cnt, tot_cnt, tot_candidates = 0, 0, 0, 0
     for Q in dataset:
-        print "querying article", q_idx
+        print("querying article", q_idx)
         if (q_idx%25 == 0):
             dateTimeObj = datetime.now()
-            print "current time =", dateTimeObj
-            print "err_cnt =", err_cnt, " ; tot_cnt =", tot_cnt
+            print("current time =", dateTimeObj)
+            print("err_cnt =", err_cnt, " ; tot_cnt =", tot_cnt)
 
         (cur_candidates, match_idx) = query(dataset, buckets_dict, d, l, Q)
         if (q_idx != match_idx):
@@ -169,13 +169,13 @@ def main():
     avg_candidates_lst = []
     for cur_d in d_lst:
         dateTimeObj = datetime.now()
-        print "current time =", dateTimeObj
-        print "cur_d =", cur_d
+        print("current time =", dateTimeObj)
+        print("cur_d =", cur_d)
         (err_perc, avg_candidates) = experiment(cur_d, l, dataset)
         err_perc_lst.append(err_perc)
         avg_candidates_lst.append(avg_candidates)
-        print "err_perc =", err_perc
-        print "avg_candidates =", avg_candidates
+        print("err_perc =", err_perc)
+        print("avg_candidates =", avg_candidates)
 
     # plot err_cnt vs Sq_size
     plt.plot(err_perc_lst, avg_candidates_lst)
