@@ -11,18 +11,6 @@ from datetime import datetime
 narticles = 1000
 max_wordid = 0  # this is 'k' for any vector computation
 
-# FIXME :
-# Runtime optimization
-# - save the hash values for each article into a dictionary of lists.
-#       (https://piazza.com/class/k8gkb66j2i53qe?cid=188)
-# - Convert bin to dec
-#       (https://piazza.com/class/k8gkb66j2i53qe?cid=190)
-# - for each such computation we can (similar to previous parts) exploit the sparsity of the vectors and avoid going through all the 60,000+ dimensions.
-#       (https://piazza.com/class/k8gkb66j2i53qe?cid=185)
-#
-# - save hash buckets to CSV files for all d values and read it back in for queries, to separate them!!
-
-
 # Separate the data into each article's bag of words, where each word = (x,y) where x = wordID and y = freq
 def import_data():
     global max_wordid
@@ -37,14 +25,6 @@ def import_data():
 
     print("max_wordid =", max_wordid)
     return data
-
-
-# def expand_vector(V):
-#    V_expanded = np.zeros((max_wordid, 1))
-#    for word_pair in V:
-#        V_expanded[word_pair[0]] = word_pair[1]
-#    return V_expanded
-
 
 def flatten_vector(V):  # get the frequencies only from the word pairs
     V_flattened = np.zeros((len(V), 1))
@@ -102,65 +82,12 @@ def populate_buckets(dataset, buckets, d, l):
     return
 
 
-# def get_best_candidate(candidates, Q, dataset):
-#    best_score = (0,0)
-#    first = True
-#    for c_idx in candidates:
-#
-#        carr = expand_vector(dataset[c_idx])
-#        qarr = expand_vector(Q)
-#        #score = (c_idx, np.linalg.norm(carr-qarr)) # use L2 similarity
-#        score = (c_idx, (np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y)))) # use Cosine similarity
-#        if first:
-#            best_score = score
-#            first = False
-#        else:
-#            if (score[1] < best_score[1]):
-#                best_score = score
-#
-#    return best_score[0] # return vector index, not actual vector
-
-# def query(dataset, buckets, d, l, Q):
-#    candidates = []
-#
-#    # Get all candidates
-#    for i in range(l):
-#        bucket_idx = hyperplane_hash(d, Q)
-#        candidates += buckets[bucket_idx]
-#    tmp = list(set(candidates))
-#    candidates = tmp # Remove duplicate candidates
-#
-#    # Return most similar candidate's idx
-#    return (len(candidates), get_best_candidate(candidates, Q, dataset))
-
-# def query_assess(dataset, buckets, d, l):
-#    q_idx, err_cnt, tot_cnt, tot_candidates = 0, 0, 0, 0
-#    for Q in dataset:
-#        print "querying article", q_idx
-#        if (q_idx%25 == 0):
-#            dateTimeObj = datetime.now()
-#            print "current time =", dateTimeObj
-#            print "err_cnt =", err_cnt, " ; tot_cnt =", tot_cnt
-#
-#        (cur_candidates, match_idx) = query(dataset, buckets, d, l, Q)
-#        if (q_idx != match_idx):
-#            err_cnt += 1
-#        q_idx += 1
-#        tot_cnt += 1
-#        tot_candidates += cur_candidates
-#
-#    err_perc = err_cnt/tot_cnt
-#    num_candidates = tot_candidates/narticles
-#    return (err_perc, num_candidates)
-
-
 def write_buckets_csv(buckets, d):
     out_csv = "buckets/buckets_d" + str(d) + ".csv"
     with open(out_csv, "wb") as csvfile:
         buckets_csv = csv.writer(csvfile, delimiter=",")
         for bucket in buckets:
             buckets_csv.writerow(bucket)
-
 
 def experiment(d, l, dataset):
     buckets = [[] for i in range(2 ** d)]  # init list of lists for Classification
